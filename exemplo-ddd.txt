@@ -1,0 +1,27 @@
+com.maschior.fms
+
+├── api
+│   ├── controller
+│   ├── request
+│   └── response
+│
+├── service
+│   ├── TransactionService
+│   ├── CategoryService
+│   └── ReportService
+│
+├── repository
+│   ├── TransactionRepository
+│   ├── CategoryRepository
+│   └── AccountRepository
+│
+├── domain
+│   ├── model
+│   │   ├── Transaction
+│   │   ├── Category
+│   │   ├── Account
+│   │   └── Money   (opcional)
+│   ├── exception
+│   └── enums
+│
+└── config
