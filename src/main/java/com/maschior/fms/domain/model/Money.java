@@ -84,9 +84,49 @@ public record Money(Long minor, Currency currency) implements Comparable<Money> 
 
         int scale = fractionDigits(currency);
 
-
+        // minor * factor -> ainda em minor (com arredondamento no minor)
+        BigDecimal resultMinor = BigDecimal.valueOf(minor).multiply(factor);
+        long newMinor;
+        try {
+            newMinor = resultMinor.setScale(0, rounding).longValueExact();
+        } catch (ArithmeticException e) {
+            throw new IllegalArgumentException("Amount out of range for floating minor units: " + factor, e);
+        }
+        return new Money(newMinor, currency);
     }
 
+    /** Divide em N partes (alocação) mantendo soma exata; sobra vai pros primeiros. */
+    public Money[] allocate(int parts) {
+        if (parts <= 0) throw new IllegalArgumentException("parts <= 0");
+        Money[] out = new Money[parts];
+
+        long base = minor / parts;
+        long remainder = Math.floorMod(minor, parts);
+
+        for (int i = 0; i < parts; i++) {
+            long extra = (i < remainder) ? 1L : 0L;
+            out[i] = new Money(base + extra, currency);
+        }
+        return out;
+    }
+
+    public boolean isZero() {
+        return minor == 0L;
+    }
+
+    public boolean isPositive() {
+        return minor > 0L;
+    }
+
+    public boolean isNegative() {
+        return minor < 0L;
+    }
+
+    @Override
+    public int compareTo(Money other) {
+        requireSameCurrency(other);
+        return Long.compare(minor, other.minor);
+    }
 
     /**
      *
